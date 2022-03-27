@@ -19,7 +19,7 @@ const firebaseConfig = {
     appId: "1:523435858478:web:9d7910b7424ca1279fddbf"
   };
 
-const port = 3000;
+const port = process.env.PORT || 3000;
   
 
 // Initialize Firebase

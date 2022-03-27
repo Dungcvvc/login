@@ -34,14 +34,16 @@ appp.post("/login", async (req, res) => {
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()){
         if(docSnap.data().password == password){
-            res.send({ msg : "Dang nhap thanh cong"})
+            //res.send({ msg : "Dang nhap thanh cong"});
+            res.json({msg : {message : "Dang nhap thanh cong"}, user: docSnap.data()});
             //console.log(docSnap.data(username));
         }else{
-            res.send({ msg : "Mat khau khong chinh xac"})
+            res.json({ msg : {message: "Mat khau khong chinh xac"} })
         }
         //console.log("Document data:", docSnap.data().password);
       } else {
-        res.send({ msg : "Sai ten dang nhap"})
+        //res.send({ msg : "Sai ten dang nhap"})
+        
       }
 
 });
@@ -59,7 +61,8 @@ appp.post("/resgister", async (req, res, next) =>{
     if(check.data(username) != null){
         //res.send({msg: "User nay da ton tai"});
         //console.log("User nay da ton tai");
-        res.send({msg: "User nay da ton tai"});
+        //res.send({msg: "User nay da ton tai"});
+        res.json({ msg : {message: "User nay da ton tai"} });
     }else{
         dky = setDoc(doc(db, "user", username), {
                                 password: password,
@@ -67,7 +70,8 @@ appp.post("/resgister", async (req, res, next) =>{
                                 avt: avt,
                                 email: email
                             });
-        res.send({msg: "Tao tai khoan thanh cong"});
+        //res.send({msg: "Tao tai khoan thanh cong"});
+        res.json({ msg : {message:"Tao tai khoan thanh cong"} })
     }
 });
 
@@ -77,14 +81,30 @@ appp.get("/data", async (req, res) => {
     res.send(list);
   });
 
-appp.post("/avt", async (req, res) => {
+appp.post("/update/profile", async (req, res) => {
     const username = req.body.username;
     const avt = req.body.avt;
+    const email = req.body.email;
+    name = req.body.name;
     const dlt =  updateDoc(doc(db, "user", username), {
         avt: avt,
+        email: email,
+        name: name,
     });
     //username.doc(id).delete();
-    res.send({ msg: "Doi avt thanh conng"});
+    //res.send({ msg: "Doi avt thanh conng"});
+    res.json({ msg : {message:"Sua thong tin thanh cong"} })
+});
+
+appp.post("/update/password", async (req, res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+    const dlt =  updateDoc(doc(db, "user", username), {
+        password: password,
+    });
+    //username.doc(id).delete();
+    //res.send({ msg: "Doi avt thanh conng"});
+    res.json({ msg : {message:"Doi mat khau thanh cong"} })
 });
 
 appp.post("/delete", async (req, res) => {
@@ -94,7 +114,7 @@ appp.post("/delete", async (req, res) => {
         //id: id,
     });
     //username.doc(id).delete();
-    res.send({ msg: "Deleted" });
+    res.json({ msg : {message:"Xoa thanh cong"} })
 });
 
 appp.listen(port, function () {

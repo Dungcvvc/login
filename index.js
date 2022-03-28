@@ -42,36 +42,49 @@ const db = getFirestore(app);
 
 appp.post("/login", async (req, res) => {
 
-
     const data = {
     username:  req.body.username,
     password: req.body.password,
     }
-    
+
+//     const q = query(collection(db, "user"));
+
+//     const querySnapshot = await getDocs(q);
+//     querySnapshot.forEach((doc) => {
+//   // doc.data() is never undefined for query doc snapshots
+//     if(doc.id == data.username){
+//         const id = doc.id;
+//     };
+//     });
+
    
-    console.log(data.username);
     //console.log(req.body.password);
     const docRef = doc(db, "user", data.username);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()){
+        const dl = {
+            id: data.username,
+            password: docSnap.data().password,
+            name: docSnap.data().name,
+            avt: docSnap.data().avt,
+            email: docSnap.data().email,
+        }
         if(docSnap.data().password == data.password){
             //res.send({ msg : "Dang nhap thanh cong"});
-            res.json({msg : {message : "Dang nhap thanh cong"}, user: docSnap.data()});
+            res.json({msg : {message : "Dang nhap thanh cong"}, user:  dl});
             //console.log(docSnap.data(username));
         }else{
             res.json({ msg : {message: "Mat khau khong chinh xac"} })
         }
         //console.log("Document data:", docSnap.data().password);
       } else {
-        //res.send({ msg : "Sai ten dang nhap"})
         res.json({ msg : {message: "Tai khoan khong chinh xac"} })
       }
-
 });
 
-appp.post("/resgister", async (req, res, next) =>{
+appp.post("/register", async (req, res, next) =>{
     var username = req.body.username;
-    var password = req.body.password;
+    var username = req.body.password;
     var name = req.body.name;
     var avt = req.body.avt;
     var email = req.body.email;
@@ -102,31 +115,56 @@ appp.get("/data", async (req, res) => {
     res.send(list);
   });
 
-appp.put("/update/profile", async (req, res) => {
+appp.post("/update/profile", async (req, res) => {
     const username = req.body.username;
     const avt = req.body.avt;
     const email = req.body.email;
-    name = req.body.name;
+    const name = req.body.name;
     const dlt =  updateDoc(doc(db, "user", username), {
         avt: avt,
         email: email,
         name: name,
     });
+
+    const docRef = doc(db, "user", username);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()){
+        const dl = {
+            id: username,
+            password: docSnap.data().password,
+            name: docSnap.data().name,
+            avt: docSnap.data().avt,
+            email: docSnap.data().email,
+        }
+        res.json({ msg : {message:"Sua thong tin thanh cong"}, user:  dl })
+      }
     //username.doc(id).delete();
     //res.send({ msg: "Doi avt thanh conng"});
-    res.json({ msg : {message:"Sua thong tin thanh cong"} })
+    
 });
 
-appp.put("/update/password", async (req, res) => {
+appp.post("/update/password", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
     
     const dlt =  updateDoc(doc(db, "user", username), {
         password: password,
     });
+    const docRef = doc(db, "user", username);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()){
+        const dl = {
+            id: username,
+            password: docSnap.data().password,
+            name: docSnap.data().name,
+            avt: docSnap.data().avt,
+            email: docSnap.data().email,
+        }
+        res.json({ msg : {message:"Sua mat khau thanh cong"}, user:  dl })
+      }
     //username.doc(id).delete();
     //res.send({ msg: "Doi avt thanh conng"});
-    res.json({ msg : {message:"Doi mat khau thanh cong"} })
+    //res.json({ msg : {message:"Doi mat khau thanh cong"} })
 });
 
 appp.post("/delete", async (req, res) => {

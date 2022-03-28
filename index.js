@@ -84,7 +84,7 @@ appp.post("/login", async (req, res) => {
 
 appp.post("/register", async (req, res, next) =>{
     var username = req.body.username;
-    var username = req.body.password;
+    var password = req.body.password;
     var name = req.body.name;
     var avt = req.body.avt;
     var email = req.body.email;

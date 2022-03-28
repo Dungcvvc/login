@@ -1,14 +1,27 @@
 const express = require("express");
-const res = require("express/lib/response");
-const appp = express();
-appp.use(express.json());
 
-
-// Import the functions you need from the SDKs you need
 const { initializeApp } = require("firebase/app");
 const { getDatabase, ref, push } = require("firebase/database");
 const { getFirestore, deleteDoc, query, where } = require("firebase/firestore");
 const { doc, setDoc, addDoc, collection, getDocs, updateDoc, getDoc, } = require("firebase/firestore");
+const res = require("express/lib/response");
+const cors = require("cors");
+var bodyParser = require("body-parser");
+const appp = express();
+appp.use(express.json());
+
+appp.use(bodyParser.urlencoded());
+appp.use(cors());
+//appp.use(bodyParser.urlencoded({ extended: false }));
+
+
+// Import the functions you need from the SDKs you need
+appp.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyAGiXjXjETffo8LkFxk6rbtdDVcYwJhP4A",
@@ -28,12 +41,20 @@ const db = getFirestore(app);
 
 
 appp.post("/login", async (req, res) => {
-    var username = req.body.username;
-    var password = req.body.password;
-    const docRef = doc(db, "user", username);
+
+
+    const data = {
+    username:  req.body.username,
+    password: req.body.password,
+    }
+    
+   
+    console.log(data.username);
+    //console.log(req.body.password);
+    const docRef = doc(db, "user", data.username);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()){
-        if(docSnap.data().password == password){
+        if(docSnap.data().password == data.password){
             //res.send({ msg : "Dang nhap thanh cong"});
             res.json({msg : {message : "Dang nhap thanh cong"}, user: docSnap.data()});
             //console.log(docSnap.data(username));
@@ -43,7 +64,7 @@ appp.post("/login", async (req, res) => {
         //console.log("Document data:", docSnap.data().password);
       } else {
         //res.send({ msg : "Sai ten dang nhap"})
-        
+        res.json({ msg : {message: "Tai khoan khong chinh xac"} })
       }
 
 });
@@ -81,7 +102,7 @@ appp.get("/data", async (req, res) => {
     res.send(list);
   });
 
-appp.post("/update/profile", async (req, res) => {
+appp.put("/update/profile", async (req, res) => {
     const username = req.body.username;
     const avt = req.body.avt;
     const email = req.body.email;
@@ -96,9 +117,10 @@ appp.post("/update/profile", async (req, res) => {
     res.json({ msg : {message:"Sua thong tin thanh cong"} })
 });
 
-appp.post("/update/password", async (req, res) => {
+appp.put("/update/password", async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
+    
     const dlt =  updateDoc(doc(db, "user", username), {
         password: password,
     });
